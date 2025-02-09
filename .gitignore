@@ -1,0 +1,16 @@
+
+/BudgetPlanner/bin
+/BudgetPlanner/obj
+/BudgetPlanner/secrets/
+/BudgetPlanner/setup.sh
+
+/BudgetPlanner/appsettings.Development.json
+/BudgetPlanner/appsettings.Production.json
+
+.vscode/
+.idea/
+
+.DS_Store
+/BudgetPlanner/Migrations
+BudgetPlanner.sln
+/saved

@@ -1,0 +1,21 @@
+@model BudgetPlanner.Models.Transaction
+
+<h2>Add Transaction</h2>
+
+<form asp-action="Create">
+    <label>Amount:</label>
+    <input type="number" asp-for="Amount" required />
+
+    <label>Category:</label>
+    <select asp-for="CategoryId">
+        @foreach (var category in ViewBag.Categories)
+        {
+            <option value="@category.Id">@category.Name</option>
+        }
+    </select>
+
+    <label>Date:</label>
+    <input type="date" asp-for="Date" required />
+
+    <button type="submit">Add</button>
+</form>

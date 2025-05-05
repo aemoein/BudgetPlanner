@@ -1,5 +1,6 @@
 using BudgetPlanner.Data;
 using BudgetPlanner.Models;
+using BudgetPlanner.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,11 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 // Add MVC controllers & views
 builder.Services.AddControllersWithViews();
 
+// Register Services
+builder.Services.AddScoped<TransactionService>();
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<BudgetService>();
+
 var app = builder.Build();
 
 // Seed database if empty
@@ -39,6 +45,11 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"Error during database seeding: {ex.Message}");
     }
 }
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
 
 // Configure middleware
 app.UseHttpsRedirection();

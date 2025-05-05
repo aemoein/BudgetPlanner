@@ -1,8 +1,122 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using System.Text.Json
+@model dynamic
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+    var categories = Model.Categories ?? new List<string>();
+    var categoryValues = Model.CategoryValues ?? new List<decimal>();
+    var income = Model.Income ?? 0;  // Default to 0 if not provided
+    var expenses = Model.Expenses ?? 0;  // Default to 0 if not provided
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h2>Budget Overview</h2>
+
+<!-- Container for charts -->
+<div class="chart-container">
+    <!-- First Chart: Pie Chart -->
+    <canvas id="budgetPieChart"></canvas>
+
+    <!-- Second Chart: Doughnut Chart for Expenses as part of Income -->
+    <canvas id="expenseIncomeChart"></canvas>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx1 = document.getElementById("budgetPieChart")?.getContext("2d");
+    var ctx2 = document.getElementById("expenseIncomeChart")?.getContext("2d");
+
+    if (ctx1 && ctx2) {
+        var categories = @Html.Raw(JsonSerializer.Serialize(categories));
+        var categoryValues = @Html.Raw(JsonSerializer.Serialize(categoryValues));
+        var income = @income;
+        var expenses = @expenses;
+
+        // Debugging: Log data to the browser console
+        console.log("Categories: ", categories);
+        console.log("Category Values: ", categoryValues);
+        console.log("Income: ", income);
+        console.log("Expenses: ", expenses);
+
+        // Data for the first chart (Pie chart)
+        var budgetData = {
+            labels: categories,
+            datasets: [{
+                data: categoryValues,
+                backgroundColor: ["green", "red", "blue", "orange", "purple"]
+            }]
+        };
+
+        // Create first chart (Pie chart)
+        new Chart(ctx1, { 
+            type: "pie", 
+            data: budgetData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 16 // Increase label font size
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Data for the second chart (Doughnut chart showing expenses as part of income)
+        var expenseData = {
+            labels: ['Income', 'Expenses'],
+            datasets: [{
+                data: [income, expenses],
+                backgroundColor: ["#4CAF50", "#FF5733"]
+            }]
+        };
+
+        // Create second chart (Doughnut chart)
+        new Chart(ctx2, {
+            type: "doughnut",
+            data: expenseData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 16 // Increase label font size
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        console.error("Canvas context is not available.");
+    }
+</script>
+
+<style>
+    /* Container for charts */
+    .chart-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        width: 100%;
+    }
+
+    /* Adjust canvas size */
+    #budgetPieChart, #expenseIncomeChart {
+        width: 50% !important; /* Each chart takes 50% of the container width */
+        height: 400px !important; /* Fixed height for consistency */
+    }
+
+    /* Ensure charts are responsive */
+    @@media (max-width: 768px) {
+        #budgetPieChart, #expenseIncomeChart {
+            width: 100% !important; /* Full width on smaller screens */
+        }
+    }
+</style>

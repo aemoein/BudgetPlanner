@@ -1,0 +1,40 @@
+@using System.Text.Json
+@model dynamic
+
+@{
+    ViewData["Title"] = "Statistics";
+    var transactions = Model.Transactions as List<dynamic> ?? new List<dynamic>();
+
+    // Extract and convert values safely
+    var dates = transactions.Select(t => ((DateTime)t.Date).ToShortDateString()).ToList();
+    var incomeValues = transactions.Where(t => (decimal)t.Amount > 0).Select(t => (decimal)t.Amount).ToList();
+    var expenseValues = transactions.Where(t => (decimal)t.Amount < 0).Select(t => (decimal)t.Amount).ToList();
+}
+
+<h2>Income & Spending Trends</h2>
+<canvas id="trendsChart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById("trendsChart").getContext("2d");
+
+    var trendsData = {
+        labels: @Html.Raw(JsonSerializer.Serialize(dates)),
+        datasets: [
+            {
+                label: "Income",
+                data: @Html.Raw(JsonSerializer.Serialize(incomeValues)),
+                borderColor: "green",
+                fill: false
+            },
+            {
+                label: "Expenses",
+                data: @Html.Raw(JsonSerializer.Serialize(expenseValues)),
+                borderColor: "red",
+                fill: false
+            }
+        ]
+    };
+
+    new Chart(ctx, { type: "line", data: trendsData });
+</script>
